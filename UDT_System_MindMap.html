@@ -445,14 +445,14 @@
             <div class="item-func"><strong>What it does:</strong> Same function as Grapevine Outbound &mdash; calls new leads from ads to book Free Intro Training. But instead of routing post-call data to n8n, this agent sends it to Chat-Dash (a different automation platform). The n8n workflows for Scottsdale exist but don't receive data from this agent.</div>
           </div>
         </div>
-        <div class="item" title="UDT SCOTTSDALE INBOUND&#10;NO webhook configured&#10;0 post-call analysis fields&#10;Outdated v3 agent — needs upgrade">
+        <div class="item" title="UDT SCOTTSDALE INBOUND&#10;NO webhook configured&#10;3 post-call extraction fields (Call Summary, Call Successful, User Sentiment)&#10;v3 agent — missing 8 fields vs outbound agents (11 fields)">
           <div class="dot d-err"></div>
           <div class="item-body">
             <div class="item-name">Inbound Bot</div>
             <div class="item-sub">UDT SCOTTSDALE INBOUND</div>
             <div class="tag t-none">&#10007; No webhook &mdash; data lost</div>
-            <div class="err-tag">0 post-call fields &middot; v3 agent</div>
-            <div class="item-func"><strong>What it does:</strong> Supposed to answer incoming calls to Scottsdale. But with no webhook configured, after each call ends the data goes nowhere &mdash; no CRM update, no follow-up, no record. Also an older v3 agent with zero post-call analysis fields, meaning it can't extract lead info even if it was connected.</div>
+            <div class="err-tag">0 analysis fields (API) &middot; 3 basic extractions only</div>
+            <div class="item-func"><strong>What it does:</strong> Answers incoming calls to Scottsdale (handles FAQs, books Free Intro Training, reschedules). Has only 3 basic extraction fields (Call Summary, Call Successful, User Sentiment). Compare: Grapevine Inbound (gold standard) has <strong>12 full analysis fields</strong> (lead qualification, training background, firearms ownership, objections, etc.). <strong>Issues:</strong> (1) No webhook &mdash; data goes nowhere. (2) Missing 12 analysis fields that Grapevine has. Needs webhook + field parity with Grapevine Inbound.</div>
           </div>
         </div>
       </div>
@@ -662,7 +662,7 @@
     <div class="issue">
       <div class="issue-n">6</div>
       <div class="issue-loc sc">SC</div>
-      <div class="issue-text"><strong>Scottsdale Inbound has no webhook</strong> &mdash; no post-call data. Also 0 analysis fields (outdated v3 agent).</div>
+      <div class="issue-text"><strong>Scottsdale Inbound has no webhook</strong> &mdash; post-call data goes nowhere. Has 3 extraction fields (Summary, Successful, Sentiment) but missing 8 fields vs outbound agents. Needs webhook + field parity.</div>
     </div>
   </div>
 
