@@ -323,7 +323,7 @@
     <div class="stat glass"><div class="stat-val" style="color:var(--text)">12</div><div class="stat-label">Workflows</div></div>
     <div class="stat glass"><div class="stat-val" style="color:var(--ok)">8</div><div class="stat-label">Active</div></div>
     <div class="stat glass"><div class="stat-val" style="color:var(--warn)">1</div><div class="stat-label">Misconfigured</div></div>
-    <div class="stat glass"><div class="stat-val" style="color:var(--warn)">4</div><div class="stat-label">Remaining</div></div>
+    <div class="stat glass"><div class="stat-val" style="color:var(--warn)">7</div><div class="stat-label">Remaining</div></div>
   </div>
 
   <!-- PLATFORMS -->
@@ -634,31 +634,54 @@
   <!-- ISSUES -->
   <div class="sec-label">Priority Fix List</div>
   <div class="issues glass">
-    <h3>&#9888; 4 Remaining Issues &mdash; 5 workflow configs FIXED Mar 28</h3>
+    <h3>&#9888; 7 Remaining Issues &mdash; 5 configs FIXED Mar 28 &mdash; ~40 min to complete</h3>
+
     <div class="issue" style="background:rgba(52,211,153,0.06);border-color:rgba(52,211,153,0.12);">
       <div class="issue-n" style="background:var(--ok);">&#10003;</div>
       <div class="issue-loc gl">GL</div>
-      <div class="issue-text"><strong style="color:var(--ok);">FIXED:</strong> All 5 Glendale workflow configs corrected via n8n API &mdash; location IDs, API keys, calendar ID, and timezones now point to Glendale. Calendar Bookings (ACTIVE) no longer corrupting data. GHL API key generated (pit-556eaf2f).</div>
+      <div class="issue-text"><strong style="color:var(--ok);">FIXED Mar 28:</strong> All 5 Glendale workflow configs corrected via n8n API &mdash; location IDs, API keys, calendar ID, and timezones. Calendar Bookings no longer corrupting data. GHL API key generated (pit-556eaf2f).</div>
     </div>
-    <div class="issue">
-      <div class="issue-n">1</div>
+
+    <div class="issue" style="border-left:3px solid var(--err);">
+      <div class="issue-n" style="background:var(--err);">1</div>
       <div class="issue-loc gl">GL</div>
-      <div class="issue-text"><strong>Outbound agent webhook mismatch</strong> &mdash; Agent still hits shared Grapevine webhook (00d8c02c), Glendale Post_Call uses (ff0ccb3b). Need to update agent webhook in Retell to point to Glendale's workflow.</div>
+      <div class="issue-text"><strong>Post_Call has hardcoded Grapevine stage ID</strong> &mdash; <code style="font-size:11px;color:var(--blue);">4355a5f3</code> = Grapevine's "Nurture / Cold" stage. This ID doesn't exist in Glendale. <strong>Root cause:</strong> Glendale's Lead Pipeline is missing 3 stages (Nurture/Cold, No-Show, Not Interested). Must add stages in GHL first, then update n8n.<br><span style="color:var(--text3);font-size:11px;">Est: 15 min &middot; Blocker: Must fix before activating Post_Call</span></div>
     </div>
-    <div class="issue">
-      <div class="issue-n">2</div>
+
+    <div class="issue" style="border-left:3px solid var(--err);">
+      <div class="issue-n" style="background:var(--err);">2</div>
       <div class="issue-loc gl">GL</div>
-      <div class="issue-text"><strong>Glendale Inbound agent has no webhook</strong> &mdash; post-call data lost. Connect to UDT_Glendale_InBound_call workflow.</div>
+      <div class="issue-text"><strong>Reactivation uses Grapevine agent + phone</strong> &mdash; Calls come from <code style="font-size:11px;color:var(--blue);">+18177789641</code> (Texas/Grapevine) instead of <code style="font-size:11px;color:var(--blue);">+14804055948</code> (Arizona/Glendale). Uses agent <code style="font-size:11px;">UDT_GRAPEVINE_REACTIVATION</code>. Need to either clone agent for Glendale or update the phone number. Also: Google Sheet <code style="font-size:11px;">1MPSK-fH7t...</code> needs verification.<br><span style="color:var(--text3);font-size:11px;">Est: 5&ndash;20 min &middot; Needs Daylon decision</span></div>
     </div>
-    <div class="issue">
-      <div class="issue-n">3</div>
+
+    <div class="issue" style="border-left:3px solid var(--warn);">
+      <div class="issue-n" style="background:var(--warn);color:#000;">3</div>
       <div class="issue-loc gl">GL</div>
-      <div class="issue-text"><strong>Corey Krebs missing from Facility Tours calendar</strong> &mdash; round-robin only has Sam &amp; Kimball.</div>
+      <div class="issue-text"><strong>Outbound agent webhook mismatch</strong> &mdash; Agent hits shared Grapevine webhook (<code style="font-size:11px;">00d8c02c</code>), but Glendale Post_Call uses (<code style="font-size:11px;">ff0ccb3b</code>). Post-call data goes to Grapevine's workflow. Fix in Retell.<br><span style="color:var(--text3);font-size:11px;">Est: 2 min &middot; Can fix via Retell API</span></div>
     </div>
+
+    <div class="issue" style="border-left:3px solid var(--warn);">
+      <div class="issue-n" style="background:var(--warn);color:#000;">4</div>
+      <div class="issue-loc gl">GL</div>
+      <div class="issue-text"><strong>Inbound agent has no webhook</strong> &mdash; Post-call data lost. Need to connect to <code style="font-size:11px;">UDT_Glendale_InBound_call</code> workflow (already config-fixed).<br><span style="color:var(--text3);font-size:11px;">Est: 2 min &middot; Can fix via Retell API</span></div>
+    </div>
+
     <div class="issue">
-      <div class="issue-n">4</div>
+      <div class="issue-n">5</div>
+      <div class="issue-loc gl">GL</div>
+      <div class="issue-text"><strong>Corey Krebs missing from Facility Tours calendar</strong> &mdash; Round-robin has Sam &amp; Kimball only. Add Corey in GHL.<br><span style="color:var(--text3);font-size:11px;">Est: 2 min &middot; Manual in GHL</span></div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-n">6</div>
       <div class="issue-loc sc">SC</div>
-      <div class="issue-text"><strong>Scottsdale Inbound has no webhook</strong> &mdash; post-call data goes nowhere. Has 3 extraction fields but missing 12 analysis fields that Grapevine Inbound has. Needs webhook + field parity.</div>
+      <div class="issue-text"><strong>Scottsdale Inbound &mdash; no webhook + missing 12 analysis fields</strong> &mdash; Has 3 basic extractions, Grapevine Inbound has 12 full fields. Needs webhook + field parity.<br><span style="color:var(--text3);font-size:11px;">Est: 10 min &middot; Can fix via Retell API</span></div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-n">7</div>
+      <div class="issue-loc gl">GL</div>
+      <div class="issue-text"><strong>Structural: Glendale missing 3 pipelines + has duplicate</strong> &mdash; Missing: 1. Enrollment, B_F Lead, Corporate Membership. Has 2x "A. Sales Pipeline" (duplicate). Needs cleanup.<br><span style="color:var(--text3);font-size:11px;">Needs Daylon decision &middot; Not blocking activation</span></div>
     </div>
   </div>
 
