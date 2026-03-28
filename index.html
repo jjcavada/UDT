@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UDT System Architecture</title>
+<style>
+  :root {
+    --bg: #0b0d14;
+    --glass: rgba(255,255,255,0.04);
+    --glass-hover: rgba(255,255,255,0.07);
+    --glass-border: rgba(255,255,255,0.08);
+    --glass-border-hover: rgba(255,255,255,0.14);
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #4a5568;
+    --ok: #34d399;
+    --warn: #fbbf24;
+    --err: #f87171;
+    --gray: #64748b;
+    --blue: #818cf8;
+    --purple: #c084fc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(11,13,20,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 16px 36px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .header h1 { font-size: 18px; font-weight: 600; color: #e2e8f0; letter-spacing: -0.3px; }
+  .header-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+  .main { max-width: 1500px; margin: 0 auto; padding: 28px 36px 80px; }
+
+  /* ─── GLASS CARD ─── */
+  .glass {
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .glass:hover { border-color: var(--glass-border-hover); background: var(--glass-hover); }
+
+  /* ─── SUMMARY ROW ─── */
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .stat {
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-val { font-size: 26px; font-weight: 700; line-height: 1.2; }
+  .stat-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1.2px; margin-top: 4px; }
+
+  /* ─── PLATFORMS ─── */
+  .platforms {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .plat {
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .plat-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--glass-border);
+    flex-shrink: 0;
+  }
+  .plat-name { font-size: 13px; font-weight: 600; }
+  .plat-desc { font-size: 11px; color: var(--text2); }
+
+  /* ─── SECTION LABEL ─── */
+  .sec-label {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 2px;
+    color: var(--text3);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  /* ─── THREE COLUMN GRID ─── */
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    align-items: start;
+    margin-bottom: 28px;
+  }
+
+  /* ─── LOCATION CARD ─── */
+  .loc {
+    padding: 0;
+    overflow: hidden;
+  }
+  .loc-head {
+    padding: 20px 22px 14px;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  .loc-name { font-size: 17px; font-weight: 700; color: var(--text); }
+  .loc-phone { font-size: 11px; color: var(--text2); margin-top: 3px; }
+  .loc-phone code { font-family: 'SF Mono','Fira Code',monospace; font-size: 11px; color: var(--blue); }
+
+  .badge {
+    font-size: 9px; padding: 4px 10px; border-radius: 20px;
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+    white-space: nowrap; flex-shrink: 0;
+    background: rgba(255,255,255,0.06); color: var(--text2);
+    border: 1px solid var(--glass-border);
+  }
+  .badge.b-ok { background: rgba(52,211,153,0.1); color: var(--ok); border-color: rgba(52,211,153,0.2); }
+  .badge.b-err { background: rgba(248,113,113,0.1); color: var(--err); border-color: rgba(248,113,113,0.2); }
+  .badge.b-warn { background: rgba(251,191,36,0.1); color: var(--warn); border-color: rgba(251,191,36,0.2); }
+
+  .loc-alert {
+    margin: 12px 22px 0;
+    font-size: 11px; font-weight: 600;
+    padding: 6px 12px; border-radius: 8px;
+    background: rgba(248,113,113,0.08); color: var(--err);
+    border: 1px solid rgba(248,113,113,0.12);
+  }
+
+  /* ─── LAYER ─── */
+  .layer { padding: 0 22px; margin-top: 4px; }
+  .layer-title {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--text3);
+    padding: 14px 0 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .layer-title .ico { font-size: 12px; opacity: 0.5; }
+
+  /* ─── ITEM ─── */
+  .item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 12px; border-radius: 10px; margin-bottom: 3px;
+    transition: background 0.12s;
+  }
+  .item:hover { background: rgba(255,255,255,0.03); }
+
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    margin-top: 6px; flex-shrink: 0;
+  }
+  .d-ok { background: var(--ok); box-shadow: 0 0 8px rgba(52,211,153,0.3); }
+  .d-warn { background: var(--warn); box-shadow: 0 0 8px rgba(251,191,36,0.3); }
+  .d-err { background: var(--err); box-shadow: 0 0 8px rgba(248,113,113,0.3); }
+  .d-gray { background: var(--gray); }
+
+  .item-body { flex: 1; min-width: 0; }
+  .item-name { font-size: 13px; font-weight: 600; }
+  .item-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
+  .item-func {
+    font-size: 11px; color: var(--text2); margin-top: 6px;
+    padding: 8px 10px; border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--glass-border);
+    line-height: 1.6;
+  }
+  .item-func strong { color: var(--text); font-weight: 600; }
+
+  .tag {
+    display: inline-block; font-size: 10px;
+    padding: 3px 9px; border-radius: 6px; margin-top: 5px;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+    color: var(--text2);
+  }
+  .tag.t-n8n { background: rgba(129,140,248,0.08); color: var(--blue); border-color: rgba(129,140,248,0.15); }
+  .tag.t-cd { background: rgba(192,132,252,0.08); color: var(--purple); border-color: rgba(192,132,252,0.15); }
+  .tag.t-none { background: rgba(248,113,113,0.08); color: var(--err); border-color: rgba(248,113,113,0.15); }
+  .tag.t-wrong { background: rgba(251,191,36,0.08); color: var(--warn); border-color: rgba(251,191,36,0.15); }
+
+  .err-tag {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px; margin-top: 4px;
+    background: rgba(248,113,113,0.06); color: var(--err);
+  }
+  .err-tag.crit { background: rgba(248,113,113,0.14); color: #fca5a5; }
+
+  /* ─── CONNECTOR ─── */
+  .conn { text-align: center; padding: 8px 0; }
+  .conn svg { opacity: 0.2; }
+
+  /* ─── GHL BAR ─── */
+  .ghl {
+    margin: 8px 22px 20px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--glass-border);
+  }
+  .ghl-name { font-size: 12px; font-weight: 600; }
+  .ghl-id { font-size: 10px; color: var(--text3); font-family: 'SF Mono','Fira Code',monospace; }
+
+  /* ─── CADENCE ─── */
+  .cadence {
+    padding: 24px;
+    margin-bottom: 28px;
+  }
+  .cadence h3 { font-size: 15px; font-weight: 700; color: var(--purple); margin-bottom: 18px; }
+  .timeline {
+    display: flex; align-items: center; position: relative;
+  }
+  .timeline::before {
+    content: ''; position: absolute;
+    top: 50%; left: 40px; right: 40px;
+    height: 1px; background: rgba(192,132,252,0.12);
+  }
+  .tday {
+    flex: 1; text-align: center; position: relative; z-index: 1;
+  }
+  .tday-circle {
+    width: 44px; height: 44px; border-radius: 50%;
+    margin: 0 auto 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: var(--purple);
+    background: rgba(192,132,252,0.06);
+    border: 1.5px solid rgba(192,132,252,0.25);
+  }
+  .tday-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; }
+  .tday-times { font-size: 11px; color: var(--text2); margin-top: 6px; line-height: 1.6; }
+  .tday-count { font-size: 10px; color: var(--purple); font-weight: 600; margin-top: 4px; }
+  .tsep { flex: 0 0 30px; text-align: center; color: var(--text3); font-size: 10px; position: relative; z-index: 1; }
+
+  /* ─── ISSUES ─── */
+  .issues {
+    padding: 24px;
+  }
+  .issues h3 {
+    font-size: 15px; font-weight: 700; color: var(--err);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .issue {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--glass-border);
+    font-size: 13px;
+  }
+  .issue:last-child { border-bottom: none; }
+  .issue-n {
+    width: 22px; height: 22px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+    background: rgba(248,113,113,0.1); color: var(--err);
+  }
+  .issue-loc {
+    font-size: 9px; padding: 3px 7px; border-radius: 4px;
+    font-weight: 700; flex-shrink: 0; margin-top: 2px;
+    background: rgba(255,255,255,0.06); color: var(--text2);
+    border: 1px solid var(--glass-border);
+  }
+  .issue-loc.gl { background: rgba(251,191,36,0.08); color: var(--warn); border-color: rgba(251,191,36,0.12); }
+  .issue-loc.sc { background: rgba(129,140,248,0.08); color: var(--blue); border-color: rgba(129,140,248,0.12); }
+  .issue-text { color: var(--text2); }
+  .issue-text strong { color: var(--text); }
+
+  /* ─── LEGEND ─── */
+  .legend {
+    display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 24px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text2); }
+  .legend-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1100px) { .cols { grid-template-columns: 1fr; } .summary { grid-template-columns: repeat(3, 1fr); } .platforms { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .summary { grid-template-columns: repeat(2, 1fr); } .platforms { grid-template-columns: 1fr; } .timeline { flex-direction: column; gap: 8px; } .timeline::before { display: none; } .tsep { display: none; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>United Defense Tactical</h1>
+    <div class="header-sub">System Architecture &amp; Connection Map</div>
+  </div>
+  <div style="text-align:right">
+    <div class="header-sub">Verified Audit &middot; March 28, 2026</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--ok)"></div> Active</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--warn)"></div> Misconfigured</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--err)"></div> Broken</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--gray)"></div> Inactive</div>
+    <div style="margin-left:auto;font-size:10px;color:var(--text3);">Hover for details</div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary">
+    <div class="stat glass"><div class="stat-val" style="color:var(--blue)">3</div><div class="stat-label">Locations</div></div>
+    <div class="stat glass"><div class="stat-val" style="color:var(--text)">7</div><div class="stat-label">Agents</div></div>
+    <div class="stat glass"><div class="stat-val" style="color:var(--text)">12</div><div class="stat-label">Workflows</div></div>
+    <div class="stat glass"><div class="stat-val" style="color:var(--ok)">8</div><div class="stat-label">Active</div></div>
+    <div class="stat glass"><div class="stat-val" style="color:var(--warn)">1</div><div class="stat-label">Misconfigured</div></div>
+    <div class="stat glass"><div class="stat-val" style="color:var(--err)">6</div><div class="stat-label">Issues</div></div>
+  </div>
+
+  <!-- PLATFORMS -->
+  <div class="platforms">
+    <div class="plat glass"><div class="plat-icon">&#9742;</div><div><div class="plat-name">Retell AI</div><div class="plat-desc">7 voice agents &middot; 11labs Cimo</div></div></div>
+    <div class="plat glass"><div class="plat-icon">&#9881;</div><div><div class="plat-name">n8n</div><div class="plat-desc">12 automation workflows</div></div></div>
+    <div class="plat glass"><div class="plat-icon">&#9783;</div><div><div class="plat-name">GoHighLevel</div><div class="plat-desc">CRM &middot; 3 sub-accounts</div></div></div>
+    <div class="plat glass"><div class="plat-icon">&#9993;</div><div><div class="plat-name">Chat-Dash</div><div class="plat-desc">Alt backend &middot; 2 agents</div></div></div>
+  </div>
+
+  <!-- THREE COLUMNS -->
+  <div class="sec-label">Locations &mdash; Agent &#8594; Workflow &#8594; CRM</div>
+  <div class="cols">
+
+    <!-- ═════ GRAPEVINE ═════ -->
+    <div class="loc glass">
+      <div class="loc-head">
+        <div>
+          <div class="loc-name">Grapevine</div>
+          <div class="loc-phone"><code>(817) 552-4507</code></div>
+        </div>
+        <div class="badge b-ok">All Good</div>
+      </div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="ico">&#9742;</span> Retell Agents</div>
+        <div class="item" title="UDT_GRAPEVINE_OUTBOUND&#10;Agent: agent_21f6d9...&#10;Webhook: 00d8c02c → n8n Post_Call&#10;11 post-call analysis fields">
+          <div class="dot d-ok"></div>
+          <div class="item-body">
+            <div class="item-name">Outbound Bot</div>
+            <div class="item-sub">UDT_GRAPEVINE_OUTBOUND</div>
+            <div class="tag t-n8n">&#8594; n8n &middot; webhook 00d8c02c</div>
+            <div class="item-func"><strong>What it does:</strong> Calls new leads from advertising/marketing. When someone fills out a form or clicks an ad, this bot calls them to book a Free Intro Training session. After the call ends, it sends all call data (lead info, call outcome, objections) to n8n for follow-up.</div>
+          </div>
+        </div>
+        <div class="item" title="UDT_GrapeVine_Inbound&#10;Agent: agent_f9b885...&#10;Webhook: api.chat-dash.com">
+          <div class="dot d-ok"></div>
+          <div class="item-body">
+            <div class="item-name">Inbound Bot</div>
+            <div class="item-sub">UDT_GrapeVine_Inbound</div>
+            <div class="tag t-cd">&#8594; Chat-Dash</div>
+            <div class="item-func"><strong>What it does:</strong> Answers incoming phone calls to the Grapevine location. Handles questions about classes, pricing, and schedules. Routes to Chat-Dash for post-call processing instead of n8n.</div>
+          </div>
+        </div>
+        <div class="item" title="UDT_GRAPEVINE_REACTIVATION&#10;Agent: agent_3c15ed...&#10;Phone: (817) 778-9641&#10;Webhook: 00d8c02c → n8n Post_Call&#10;Reads Google Sheets, loops cold leads">
+          <div class="dot d-ok"></div>
+          <div class="item-body">
+            <div class="item-name">Reactivation Bot</div>
+            <div class="item-sub">UDT_GRAPEVINE_REACTIVATION &middot; (817) 778-9641</div>
+            <div class="tag t-n8n">&#8594; n8n &middot; webhook 00d8c02c</div>
+            <div class="item-func"><strong>What it does:</strong> Re-engages cold/nurture leads who showed interest before but never booked or went cold. Pulls contacts from a Google Sheet and calls them to book a Free Intro Training. Uses a separate phone number from the main outbound bot.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="conn"><svg width="2" height="20"><line x1="1" y1="0" x2="1" y2="20" stroke="#fff" stroke-width="1" stroke-dasharray="3,3"/></svg></div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="ico">&#9881;</span> n8n Workflows</div>
+        <div class="item" title="UDT_GV_POST_CALL&#10;41 nodes &middot; Full 7-day/7-call cadence&#10;Shared webhook: 00d8c02c">
+          <div class="dot d-ok"></div>
+          <div class="item-body">
+            <div class="item-name">Post_Call Analysis</div><div class="item-sub">41 nodes &middot; Follow-up cadence &middot; ACTIVE</div>
+            <div class="item-func"><strong>What it does:</strong> The brain of the follow-up system. After any outbound/reactivation call ends, Retell sends the call data here. This workflow creates or updates the contact in GHL, tags them based on call outcome (interested, not interested, no answer, etc.), and if they didn't book, schedules the 7-day/7-call follow-up cadence to keep calling them back.</div>
+          </div>
+        </div>
+        <div class="item" title="InBound_call_UDT_GrapeVine&#10;Webhook: bef89ce6">
+          <div class="dot d-ok"></div>
+          <div class="item-body">
+            <div class="item-name">Inbound Call</div><div class="item-sub">ACTIVE</div>
+            <div class="item-func"><strong>What it does:</strong> Handles post-call data from inbound calls. When someone calls Grapevine and the Inbound Bot answers, the call data gets routed here for logging and CRM updates.</div>
+          </div>
+        </div>
+        <div class="item" title="UDT_GV_REACTIVATION_CALL&#10;21 nodes &middot; Reads Google Sheets">
+          <div class="dot d-ok"></div>
+          <div class="item-body">
+            <div class="item-name">Reactivation Call</div><div class="item-sub">21 nodes &middot; Google Sheets &middot; ACTIVE</div>
+            <div class="item-func"><strong>What it does:</strong> Pulls a list of cold leads from a Google Sheet, then triggers the Reactivation Bot to call each one. Manages the queue so leads get called in order and tracks who was already contacted.</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="dot d-ok"></div>
+          <div class="item-body">
+            <div class="item-name">Error Alert</div><div class="item-sub">ACTIVE</div>
+            <div class="item-func"><strong>What it does:</strong> Monitors the other Grapevine workflows. If any workflow fails or throws an error, this sends an alert notification so the team knows something broke.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="conn"><svg width="2" height="20"><line x1="1" y1="0" x2="1" y2="20" stroke="#fff" stroke-width="1" stroke-dasharray="3,3"/></svg></div>
+
+      <div class="ghl" title="Location: 3SsPXJ0NhSQFfRMmTEN9&#10;API: pit-e0bee515...">
+        <div class="dot d-ok" style="margin-top:0"></div>
+        <div>
+          <div class="ghl-name">GHL Grapevine</div><div class="ghl-id">3SsPXJ0NhSQFfRMmTEN9</div>
+          <div class="item-func" style="margin-top:8px;"><strong>What it does:</strong> CRM for Grapevine. Stores all contacts, manages the Facility Tours calendar for booking appointments, tracks leads through pipeline stages, and sends booking confirmation emails/SMS.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═════ SCOTTSDALE ═════ -->
+    <div class="loc glass">
+      <div class="loc-head">
+        <div>
+          <div class="loc-name">Scottsdale</div>
+          <div class="loc-phone"><code>(623) 292-7381</code></div>
+        </div>
+        <div class="badge b-warn">1 Issue</div>
+      </div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="ico">&#9742;</span> Retell Agents</div>
+        <div class="item" title="UDT_Scottsdale speed to lead&#10;Webhook: api.chat-dash.com (NOT n8n)&#10;11 post-call analysis fields">
+          <div class="dot d-ok"></div>
+          <div class="item-body">
+            <div class="item-name">Outbound Bot</div>
+            <div class="item-sub">UDT_Scottsdale speed to lead</div>
+            <div class="tag t-cd">&#8594; Chat-Dash (not n8n)</div>
+            <div class="item-func"><strong>What it does:</strong> Same function as Grapevine Outbound &mdash; calls new leads from ads to book Free Intro Training. But instead of routing post-call data to n8n, this agent sends it to Chat-Dash (a different automation platform). The n8n workflows for Scottsdale exist but don't receive data from this agent.</div>
+          </div>
+        </div>
+        <div class="item" title="UDT SCOTTSDALE INBOUND&#10;NO webhook configured&#10;3 post-call extraction fields (Call Summary, Call Successful, User Sentiment)&#10;v3 agent — missing 8 fields vs outbound agents (11 fields)">
+          <div class="dot d-err"></div>
+          <div class="item-body">
+            <div class="item-name">Inbound Bot</div>
+            <div class="item-sub">UDT SCOTTSDALE INBOUND</div>
+            <div class="tag t-none">&#10007; No webhook &mdash; data lost</div>
+            <div class="err-tag">0 analysis fields (API) &middot; 3 basic extractions only</div>
+            <div class="item-func"><strong>What it does:</strong> Answers incoming calls to Scottsdale (handles FAQs, books Free Intro Training, reschedules). Has only 3 basic extraction fields (Call Summary, Call Successful, User Sentiment). Compare: Grapevine Inbound (gold standard) has <strong>12 full analysis fields</strong> (lead qualification, training background, firearms ownership, objections, etc.). <strong>Issues:</strong> (1) No webhook &mdash; data goes nowhere. (2) Missing 12 analysis fields that Grapevine has. Needs webhook + field parity with Grapevine Inbound.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="conn"><svg width="2" height="20"><line x1="1" y1="0" x2="1" y2="20" stroke="#fff" stroke-width="1" stroke-dasharray="3,3"/></svg></div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="ico">&#9881;</span> n8n Workflows</div>
+        <div class="item" title="UDT_Make_Call&#10;Location: ogsYCdij (correct)&#10;Note: Agent routes to Chat-Dash instead">
+          <div class="dot d-ok"></div>
+          <div class="item-body">
+            <div class="item-name">Make_Call</div><div class="item-sub">Correct config &middot; ACTIVE &middot; Agent uses Chat-Dash</div>
+            <div class="item-func"><strong>What it does:</strong> Triggers the Scottsdale outbound bot to call a lead. When GHL fires a webhook (e.g., new contact from ad), this workflow tells Retell to make the call. Config is correct, but the agent's post-call data goes to Chat-Dash instead of coming back to n8n.</div>
+          </div>
+        </div>
+        <div class="item" title="UDT_Post_Call_Analysis&#10;Full 7-day cadence&#10;May not receive data (Chat-Dash routing)">
+          <div class="dot d-ok"></div>
+          <div class="item-body">
+            <div class="item-name">Post_Call Analysis</div><div class="item-sub">Has cadence &middot; ACTIVE &middot; May not receive data</div>
+            <div class="item-func"><strong>What it does:</strong> Same structure as Grapevine's Post_Call &mdash; designed to receive call data, update GHL contacts, and run the 7-day follow-up cadence. However, since the Scottsdale agent routes to Chat-Dash, this workflow may not be receiving post-call data through n8n.</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="dot d-ok"></div>
+          <div class="item-body">
+            <div class="item-name">Error Alert</div><div class="item-sub">ACTIVE</div>
+            <div class="item-func"><strong>What it does:</strong> Monitors Scottsdale workflows for failures and sends alert notifications when something breaks.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="conn"><svg width="2" height="20"><line x1="1" y1="0" x2="1" y2="20" stroke="#fff" stroke-width="1" stroke-dasharray="3,3"/></svg></div>
+
+      <div class="ghl" title="Location: ogsYCdij2l2Si4Xgghao&#10;API: pit-5edc68eb...">
+        <div class="dot d-ok" style="margin-top:0"></div>
+        <div>
+          <div class="ghl-name">GHL Scottsdale</div><div class="ghl-id">ogsYCdij2l2Si4Xgghao</div>
+          <div class="item-func" style="margin-top:8px;"><strong>What it does:</strong> CRM for Scottsdale. Stores contacts, manages calendars and bookings, tracks leads through pipeline stages. Connected correctly.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═════ GLENDALE ═════ -->
+    <div class="loc glass">
+      <div class="loc-head">
+        <div>
+          <div class="loc-name">Glendale</div>
+          <div class="loc-phone"><code>(480) 405-5948</code></div>
+        </div>
+        <div class="badge b-err">6 Issues</div>
+      </div>
+
+      <div class="loc-alert">Workflows cloned from Grapevine Dec 29 &mdash; configs never updated</div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="ico">&#9742;</span> Retell Agents</div>
+        <div class="item" title="UDT_GLENDALE_OUTBOUND&#10;Webhook: 00d8c02c (shared with Grapevine)&#10;PROBLEM: Hits Grapevine Post_Call, not Glendale's&#10;Should point to ff0ccb3b">
+          <div class="dot d-warn"></div>
+          <div class="item-body">
+            <div class="item-name">Outbound Bot</div>
+            <div class="item-sub">UDT_GLENDALE_OUTBOUND</div>
+            <div class="tag t-wrong">&#8594; n8n but hits GRAPEVINE Post_Call (wrong)</div>
+            <div class="err-tag">Should use Glendale webhook ff0ccb3b</div>
+            <div class="item-func"><strong>What it does:</strong> Calls new leads from ads for Glendale &mdash; same function as Grapevine Outbound. But its webhook still points to the shared Grapevine Post_Call workflow (00d8c02c), so after calls end, the data gets processed as if it's a Grapevine lead, creating contacts in the wrong GHL location.</div>
+          </div>
+        </div>
+        <div class="item" title="UDT_Glendale_Inbound&#10;NO webhook configured&#10;All inbound post-call data is lost">
+          <div class="dot d-err"></div>
+          <div class="item-body">
+            <div class="item-name">Inbound Bot</div>
+            <div class="item-sub">UDT_Glendale_Inbound</div>
+            <div class="tag t-none">&#10007; No webhook &mdash; data lost</div>
+            <div class="item-func"><strong>What it does:</strong> Supposed to answer incoming calls to the Glendale number. The agent exists and can take calls, but with no webhook, all post-call data disappears after the call &mdash; no CRM update, no lead captured, no follow-up scheduled.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="conn"><svg width="2" height="20"><line x1="1" y1="0" x2="1" y2="20" stroke="#fff" stroke-width="1" stroke-dasharray="3,3"/></svg></div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="ico">&#9881;</span> n8n Workflows</div>
+        <div class="item" title="UDT_Glendale_Calendar_Bookings&#10;ACTIVE but WRONG:&#10;Location = Grapevine&#10;Calendar = wrong ID&#10;API key = Grapevine&#10;ROUTING BOOKINGS TO WRONG LOCATION">
+          <div class="dot d-warn"></div>
+          <div class="item-body">
+            <div class="item-name">Calendar Bookings</div>
+            <div class="item-sub">ACTIVE &mdash; wrong config</div>
+            <div class="err-tag">Location = Grapevine &middot; Wrong calendar &middot; Wrong API</div>
+            <div class="err-tag crit">ROUTING BOOKINGS TO WRONG LOCATION</div>
+            <div class="item-func"><strong>What it does:</strong> Handles calendar booking events &mdash; when a lead books a Facility Tour through the calendar, this workflow processes it and creates the appointment in GHL. <strong style="color:var(--err)">Problem:</strong> It's pointing to Grapevine's location + wrong calendar ID, so any bookings are being created in Grapevine's CRM, not Glendale's.</div>
+          </div>
+        </div>
+        <div class="item" title="UDT_Glendale_Make_Call&#10;INACTIVE&#10;Location = Scottsdale (wrong)&#10;Timezone = America/Chicago (wrong)">
+          <div class="dot d-gray"></div>
+          <div class="item-body">
+            <div class="item-name">Make_Call</div>
+            <div class="item-sub">INACTIVE</div>
+            <div class="err-tag">Location = Scottsdale &middot; Timezone = Chicago</div>
+            <div class="item-func"><strong>What it does:</strong> Supposed to trigger the Glendale Outbound Bot to call a lead when GHL fires a webhook (new contact from ad). The agent ID and phone number are correct, but the location ID points to Scottsdale and the timezone is set to Chicago instead of Phoenix. Needs both fixed before activating.</div>
+          </div>
+        </div>
+        <div class="item" title="UDT_Glendale_Post_Call&#10;INACTIVE&#10;Location = Grapevine&#10;API key = Grapevine&#10;Webhook mismatch with agent">
+          <div class="dot d-gray"></div>
+          <div class="item-body">
+            <div class="item-name">Post_Call Analysis</div>
+            <div class="item-sub">INACTIVE</div>
+            <div class="err-tag">Location = Grapevine &middot; Wrong API &middot; Webhook mismatch</div>
+            <div class="item-func"><strong>What it does:</strong> Should be Glendale's version of the 7-day follow-up cadence &mdash; receive post-call data, update GHL contacts, tag them, and schedule follow-up calls. But the location ID, API key, and webhook are all wrong (still Grapevine's). Also the webhook URL (ff0ccb3b) doesn't match the agent's webhook (00d8c02c).</div>
+          </div>
+        </div>
+        <div class="item" title="UDT_Glendale_InBound_call&#10;INACTIVE&#10;Location = Grapevine (wrong)">
+          <div class="dot d-gray"></div>
+          <div class="item-body">
+            <div class="item-name">Inbound Call</div>
+            <div class="item-sub">INACTIVE</div>
+            <div class="err-tag">Location = Grapevine</div>
+            <div class="item-func"><strong>What it does:</strong> Should handle post-call data from Glendale inbound calls and log them in GHL. Currently inactive and configured with Grapevine's location ID. The Glendale Inbound agent also has no webhook pointing here yet.</div>
+          </div>
+        </div>
+        <div class="item" title="UDT_Glendale_Reactivation_call&#10;INACTIVE&#10;Location = Grapevine in 2 nodes">
+          <div class="dot d-gray"></div>
+          <div class="item-body">
+            <div class="item-name">Reactivation Call</div>
+            <div class="item-sub">INACTIVE</div>
+            <div class="err-tag">Location = Grapevine in 2 nodes</div>
+            <div class="item-func"><strong>What it does:</strong> Should pull cold Glendale leads from a Google Sheet and trigger the Reactivation Bot to call them &mdash; same function as Grapevine's reactivation workflow. Location ID is wrong in 2 separate nodes (both still point to Grapevine).</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="conn"><svg width="2" height="20"><line x1="1" y1="0" x2="1" y2="20" stroke="#fff" stroke-width="1" stroke-dasharray="3,3"/></svg></div>
+
+      <div class="ghl" title="Location: cHM5P4HJGQqk3nYviV4T&#10;API key: UNKNOWN&#10;Calendar: Facility Tours&#10;Corey Krebs missing">
+        <div class="dot d-warn" style="margin-top:0"></div>
+        <div>
+          <div class="ghl-name">GHL Glendale</div><div class="ghl-id">cHM5P4HJGQqk3nYviV4T &middot; API key unknown &middot; Corey missing</div>
+          <div class="item-func" style="margin-top:8px;"><strong>What it does:</strong> CRM for Glendale. Stores contacts, manages Facility Tours calendar (round-robin with Sam &amp; Kimball &mdash; Corey Krebs needs to be added). API key for this location is unknown and needs to be generated. Currently workflows use Grapevine's or Scottsdale's API keys instead.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CADENCE -->
+  <div class="sec-label">7-Day Follow-Up Cadence</div>
+  <div class="cadence glass">
+    <h3>7 Calls Over 7 Days &middot; 9 AM &ndash; 7 PM</h3>
+    <div class="timeline">
+      <div class="tday">
+        <div class="tday-circle">1</div>
+        <div class="tday-label">Day 1</div>
+        <div class="tday-times">9:00 AM<br>12:00 PM</div>
+        <div class="tday-count">2 calls</div>
+      </div>
+      <div class="tsep">&middot;&middot;&middot;</div>
+      <div class="tday">
+        <div class="tday-circle">3</div>
+        <div class="tday-label">Day 3</div>
+        <div class="tday-times">10:30 AM</div>
+        <div class="tday-count">1 call</div>
+      </div>
+      <div class="tsep">&middot;&middot;&middot;</div>
+      <div class="tday">
+        <div class="tday-circle">5</div>
+        <div class="tday-label">Day 5</div>
+        <div class="tday-times">4:00 PM<br>7:00 PM</div>
+        <div class="tday-count">2 calls</div>
+      </div>
+      <div class="tsep">&middot;&middot;&middot;</div>
+      <div class="tday">
+        <div class="tday-circle">7</div>
+        <div class="tday-label">Day 7</div>
+        <div class="tday-times">8:30 AM<br>5:00 PM</div>
+        <div class="tday-count">2 calls</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ISSUES -->
+  <div class="sec-label">Priority Fix List</div>
+  <div class="issues glass">
+    <h3>&#9888; 6 Issues &mdash; Ordered by Priority</h3>
+    <div class="issue">
+      <div class="issue-n">1</div>
+      <div class="issue-loc gl">GL</div>
+      <div class="issue-text"><strong>Calendar Bookings ACTIVE with wrong config</strong> &mdash; routing bookings to Grapevine instead of Glendale. Fix location ID, calendar ID, and API key.</div>
+    </div>
+    <div class="issue">
+      <div class="issue-n">2</div>
+      <div class="issue-loc gl">GL</div>
+      <div class="issue-text"><strong>Outbound agent webhook mismatch</strong> &mdash; Agent hits shared Grapevine webhook (00d8c02c), Glendale Post_Call uses (ff0ccb3b). Need to align.</div>
+    </div>
+    <div class="issue">
+      <div class="issue-n">3</div>
+      <div class="issue-loc gl">GL</div>
+      <div class="issue-text"><strong>4 inactive workflows have wrong location IDs</strong> &mdash; Make_Call = Scottsdale, other 3 = Grapevine. All need <code style="font-size:11px;color:var(--blue);">cHM5P4HJGQqk3nYviV4T</code></div>
+    </div>
+    <div class="issue">
+      <div class="issue-n">4</div>
+      <div class="issue-loc gl">GL</div>
+      <div class="issue-text"><strong>Glendale Inbound agent has no webhook</strong> &mdash; post-call data lost. Connect to UDT_Glendale_InBound_call workflow.</div>
+    </div>
+    <div class="issue">
+      <div class="issue-n">5</div>
+      <div class="issue-loc gl">GL</div>
+      <div class="issue-text"><strong>Corey Krebs missing from Facility Tours calendar</strong> &mdash; round-robin only has Sam &amp; Kimball.</div>
+    </div>
+    <div class="issue">
+      <div class="issue-n">6</div>
+      <div class="issue-loc sc">SC</div>
+      <div class="issue-text"><strong>Scottsdale Inbound has no webhook</strong> &mdash; post-call data goes nowhere. Has 3 extraction fields (Summary, Successful, Sentiment) but missing 8 fields vs outbound agents. Needs webhook + field parity.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
