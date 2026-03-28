@@ -323,7 +323,7 @@
     <div class="stat glass"><div class="stat-val" style="color:var(--text)">12</div><div class="stat-label">Workflows</div></div>
     <div class="stat glass"><div class="stat-val" style="color:var(--ok)">8</div><div class="stat-label">Active</div></div>
     <div class="stat glass"><div class="stat-val" style="color:var(--warn)">1</div><div class="stat-label">Misconfigured</div></div>
-    <div class="stat glass"><div class="stat-val" style="color:var(--err)">6</div><div class="stat-label">Issues</div></div>
+    <div class="stat glass"><div class="stat-val" style="color:var(--warn)">4</div><div class="stat-label">Remaining</div></div>
   </div>
 
   <!-- PLATFORMS -->
@@ -502,10 +502,10 @@
           <div class="loc-name">Glendale</div>
           <div class="loc-phone"><code>(480) 405-5948</code></div>
         </div>
-        <div class="badge b-err">6 Issues</div>
+        <div class="badge b-warn">2 Issues</div>
       </div>
 
-      <div class="loc-alert">Workflows cloned from Grapevine Dec 29 &mdash; configs never updated</div>
+      <div class="loc-alert" style="background:rgba(52,211,153,0.08);border-color:rgba(52,211,153,0.15);color:#34d399;">&#10003; Workflow configs FIXED Mar 28 &mdash; location IDs, API keys, calendar, timezones all corrected</div>
 
       <div class="layer">
         <div class="layer-title"><span class="ico">&#9742;</span> Retell Agents</div>
@@ -534,61 +534,62 @@
 
       <div class="layer">
         <div class="layer-title"><span class="ico">&#9881;</span> n8n Workflows</div>
-        <div class="item" title="UDT_Glendale_Calendar_Bookings&#10;ACTIVE but WRONG:&#10;Location = Grapevine&#10;Calendar = wrong ID&#10;API key = Grapevine&#10;ROUTING BOOKINGS TO WRONG LOCATION">
-          <div class="dot d-warn"></div>
+        <div class="item" title="UDT_Glendale_Calendar_Bookings&#10;ACTIVE ✅ FIXED Mar 28&#10;Location = Glendale ✅&#10;Calendar = H1XBRM6gSwL85unlTpy9 ✅&#10;API key = Glendale ✅&#10;Timezone = America/Phoenix ✅">
+          <div class="dot d-ok"></div>
           <div class="item-body">
             <div class="item-name">Calendar Bookings</div>
-            <div class="item-sub">ACTIVE &mdash; wrong config</div>
-            <div class="err-tag">Location = Grapevine &middot; Wrong calendar &middot; Wrong API</div>
-            <div class="err-tag crit">ROUTING BOOKINGS TO WRONG LOCATION</div>
-            <div class="item-func"><strong>What it does:</strong> Handles calendar booking events &mdash; when a lead books a Facility Tour through the calendar, this workflow processes it and creates the appointment in GHL. <strong style="color:var(--err)">Problem:</strong> It's pointing to Grapevine's location + wrong calendar ID, so any bookings are being created in Grapevine's CRM, not Glendale's.</div>
+            <div class="item-sub">ACTIVE &mdash; &#10003; config fixed</div>
+            <div class="tag t-ok">&#10003; Location = Glendale &middot; Correct calendar &middot; Correct API</div>
+            <div class="item-func"><strong>What it does:</strong> Handles calendar booking events &mdash; when a lead books a Facility Tour, this workflow creates the appointment in GHL Glendale. <strong style="color:var(--ok)">Fixed Mar 28:</strong> Location ID, calendar ID, API key, and timezone all corrected to Glendale values.</div>
           </div>
         </div>
-        <div class="item" title="UDT_Glendale_Make_Call&#10;INACTIVE&#10;Location = Scottsdale (wrong)&#10;Timezone = America/Chicago (wrong)">
-          <div class="dot d-gray"></div>
+        <div class="item" title="UDT_Glendale_Make_Call&#10;INACTIVE — config FIXED Mar 28&#10;Location = Glendale ✅&#10;Timezone = America/Phoenix ✅&#10;Ready to activate">
+          <div class="dot d-ok"></div>
           <div class="item-body">
             <div class="item-name">Make_Call</div>
-            <div class="item-sub">INACTIVE</div>
-            <div class="err-tag">Location = Scottsdale &middot; Timezone = Chicago</div>
-            <div class="item-func"><strong>What it does:</strong> Supposed to trigger the Glendale Outbound Bot to call a lead when GHL fires a webhook (new contact from ad). The agent ID and phone number are correct, but the location ID points to Scottsdale and the timezone is set to Chicago instead of Phoenix. Needs both fixed before activating.</div>
+            <div class="item-sub">INACTIVE &mdash; config fixed, ready to activate</div>
+            <div class="tag t-ok">&#10003; Location = Glendale &middot; Timezone = Phoenix</div>
+            <div class="item-func"><strong>What it does:</strong> Triggers the Glendale Outbound Bot to call a lead when GHL fires a webhook (new contact from ad). Agent ID and phone are correct. <strong style="color:var(--ok)">Fixed Mar 28:</strong> Location ID and timezone corrected. Needs activation when ready to start calling.</div>
           </div>
         </div>
-        <div class="item" title="UDT_Glendale_Post_Call&#10;INACTIVE&#10;Location = Grapevine&#10;API key = Grapevine&#10;Webhook mismatch with agent">
-          <div class="dot d-gray"></div>
+        <div class="item" title="UDT_Glendale_Post_Call&#10;INACTIVE — config FIXED Mar 28&#10;Location = Glendale ✅&#10;API key = Glendale ✅&#10;NOTE: Webhook mismatch with agent still exists">
+          <div class="dot d-warn"></div>
           <div class="item-body">
             <div class="item-name">Post_Call Analysis</div>
-            <div class="item-sub">INACTIVE</div>
-            <div class="err-tag">Location = Grapevine &middot; Wrong API &middot; Webhook mismatch</div>
-            <div class="item-func"><strong>What it does:</strong> Should be Glendale's version of the 7-day follow-up cadence &mdash; receive post-call data, update GHL contacts, tag them, and schedule follow-up calls. But the location ID, API key, and webhook are all wrong (still Grapevine's). Also the webhook URL (ff0ccb3b) doesn't match the agent's webhook (00d8c02c).</div>
+            <div class="item-sub">INACTIVE &mdash; config fixed, webhook mismatch remains</div>
+            <div class="tag t-ok">&#10003; Location = Glendale &middot; Correct API</div>
+            <div class="err-tag">Webhook mismatch: agent uses 00d8c02c, this workflow uses ff0ccb3b</div>
+            <div class="item-func"><strong>What it does:</strong> Glendale's 7-day follow-up cadence &mdash; receives post-call data, updates GHL contacts, tags, schedules follow-ups. <strong style="color:var(--ok)">Fixed Mar 28:</strong> Location ID and API key corrected. <strong style="color:var(--warn)">Remaining:</strong> The Outbound agent's webhook (00d8c02c) still routes to Grapevine Post_Call, not this workflow (ff0ccb3b). Agent webhook needs updating in Retell.</div>
           </div>
         </div>
-        <div class="item" title="UDT_Glendale_InBound_call&#10;INACTIVE&#10;Location = Grapevine (wrong)">
-          <div class="dot d-gray"></div>
+        <div class="item" title="UDT_Glendale_InBound_call&#10;INACTIVE — config FIXED Mar 28&#10;Location = Glendale ✅&#10;API key = Glendale ✅&#10;NOTE: Agent has no webhook pointing here">
+          <div class="dot d-warn"></div>
           <div class="item-body">
             <div class="item-name">Inbound Call</div>
-            <div class="item-sub">INACTIVE</div>
-            <div class="err-tag">Location = Grapevine</div>
-            <div class="item-func"><strong>What it does:</strong> Should handle post-call data from Glendale inbound calls and log them in GHL. Currently inactive and configured with Grapevine's location ID. The Glendale Inbound agent also has no webhook pointing here yet.</div>
+            <div class="item-sub">INACTIVE &mdash; config fixed, needs agent webhook</div>
+            <div class="tag t-ok">&#10003; Location = Glendale &middot; Correct API</div>
+            <div class="err-tag">Agent has no webhook &mdash; needs connecting</div>
+            <div class="item-func"><strong>What it does:</strong> Handles post-call data from Glendale inbound calls and logs in GHL. <strong style="color:var(--ok)">Fixed Mar 28:</strong> Location ID and API key corrected. <strong style="color:var(--warn)">Remaining:</strong> The Glendale Inbound agent has no webhook configured &mdash; needs to be pointed to this workflow's webhook URL.</div>
           </div>
         </div>
-        <div class="item" title="UDT_Glendale_Reactivation_call&#10;INACTIVE&#10;Location = Grapevine in 2 nodes">
-          <div class="dot d-gray"></div>
+        <div class="item" title="UDT_Glendale_Reactivation_call&#10;INACTIVE — config FIXED Mar 28&#10;Location = Glendale ✅ (both nodes)&#10;API key = Glendale ✅">
+          <div class="dot d-ok"></div>
           <div class="item-body">
             <div class="item-name">Reactivation Call</div>
-            <div class="item-sub">INACTIVE</div>
-            <div class="err-tag">Location = Grapevine in 2 nodes</div>
-            <div class="item-func"><strong>What it does:</strong> Should pull cold Glendale leads from a Google Sheet and trigger the Reactivation Bot to call them &mdash; same function as Grapevine's reactivation workflow. Location ID is wrong in 2 separate nodes (both still point to Grapevine).</div>
+            <div class="item-sub">INACTIVE &mdash; config fixed, ready to activate</div>
+            <div class="tag t-ok">&#10003; Location = Glendale (both nodes) &middot; Correct API</div>
+            <div class="item-func"><strong>What it does:</strong> Pulls cold Glendale leads from Google Sheet and triggers the Reactivation Bot to call them. <strong style="color:var(--ok)">Fixed Mar 28:</strong> Both location ID references and API key corrected to Glendale.</div>
           </div>
         </div>
       </div>
 
       <div class="conn"><svg width="2" height="20"><line x1="1" y1="0" x2="1" y2="20" stroke="#fff" stroke-width="1" stroke-dasharray="3,3"/></svg></div>
 
-      <div class="ghl" title="Location: cHM5P4HJGQqk3nYviV4T&#10;API key: UNKNOWN&#10;Calendar: Facility Tours&#10;Corey Krebs missing">
-        <div class="dot d-warn" style="margin-top:0"></div>
+      <div class="ghl" title="Location: cHM5P4HJGQqk3nYviV4T&#10;API key: pit-556eaf2f ✅&#10;Calendar: Facility Tours (H1XBRM6gSwL85unlTpy9)&#10;Corey Krebs still missing">
+        <div class="dot d-ok" style="margin-top:0"></div>
         <div>
-          <div class="ghl-name">GHL Glendale</div><div class="ghl-id">cHM5P4HJGQqk3nYviV4T &middot; API key unknown &middot; Corey missing</div>
-          <div class="item-func" style="margin-top:8px;"><strong>What it does:</strong> CRM for Glendale. Stores contacts, manages Facility Tours calendar (round-robin with Sam &amp; Kimball &mdash; Corey Krebs needs to be added). API key for this location is unknown and needs to be generated. Currently workflows use Grapevine's or Scottsdale's API keys instead.</div>
+          <div class="ghl-name">GHL Glendale</div><div class="ghl-id">cHM5P4HJGQqk3nYviV4T &middot; API key &#10003; pit-556eaf2f &middot; Corey still missing</div>
+          <div class="item-func" style="margin-top:8px;"><strong>What it does:</strong> CRM for Glendale. Stores contacts, manages Facility Tours calendar (H1XBRM6gSwL85unlTpy9, round-robin with Sam &amp; Kimball &mdash; Corey Krebs needs to be added). <strong style="color:var(--ok)">API key generated Mar 28:</strong> pit-556eaf2f (N8N Connection). All workflows now use the correct Glendale key.</div>
         </div>
       </div>
     </div>
@@ -633,36 +634,31 @@
   <!-- ISSUES -->
   <div class="sec-label">Priority Fix List</div>
   <div class="issues glass">
-    <h3>&#9888; 6 Issues &mdash; Ordered by Priority</h3>
+    <h3>&#9888; 4 Remaining Issues &mdash; 5 workflow configs FIXED Mar 28</h3>
+    <div class="issue" style="background:rgba(52,211,153,0.06);border-color:rgba(52,211,153,0.12);">
+      <div class="issue-n" style="background:var(--ok);">&#10003;</div>
+      <div class="issue-loc gl">GL</div>
+      <div class="issue-text"><strong style="color:var(--ok);">FIXED:</strong> All 5 Glendale workflow configs corrected via n8n API &mdash; location IDs, API keys, calendar ID, and timezones now point to Glendale. Calendar Bookings (ACTIVE) no longer corrupting data. GHL API key generated (pit-556eaf2f).</div>
+    </div>
     <div class="issue">
       <div class="issue-n">1</div>
       <div class="issue-loc gl">GL</div>
-      <div class="issue-text"><strong>Calendar Bookings ACTIVE with wrong config</strong> &mdash; routing bookings to Grapevine instead of Glendale. Fix location ID, calendar ID, and API key.</div>
+      <div class="issue-text"><strong>Outbound agent webhook mismatch</strong> &mdash; Agent still hits shared Grapevine webhook (00d8c02c), Glendale Post_Call uses (ff0ccb3b). Need to update agent webhook in Retell to point to Glendale's workflow.</div>
     </div>
     <div class="issue">
       <div class="issue-n">2</div>
       <div class="issue-loc gl">GL</div>
-      <div class="issue-text"><strong>Outbound agent webhook mismatch</strong> &mdash; Agent hits shared Grapevine webhook (00d8c02c), Glendale Post_Call uses (ff0ccb3b). Need to align.</div>
+      <div class="issue-text"><strong>Glendale Inbound agent has no webhook</strong> &mdash; post-call data lost. Connect to UDT_Glendale_InBound_call workflow.</div>
     </div>
     <div class="issue">
       <div class="issue-n">3</div>
       <div class="issue-loc gl">GL</div>
-      <div class="issue-text"><strong>4 inactive workflows have wrong location IDs</strong> &mdash; Make_Call = Scottsdale, other 3 = Grapevine. All need <code style="font-size:11px;color:var(--blue);">cHM5P4HJGQqk3nYviV4T</code></div>
-    </div>
-    <div class="issue">
-      <div class="issue-n">4</div>
-      <div class="issue-loc gl">GL</div>
-      <div class="issue-text"><strong>Glendale Inbound agent has no webhook</strong> &mdash; post-call data lost. Connect to UDT_Glendale_InBound_call workflow.</div>
-    </div>
-    <div class="issue">
-      <div class="issue-n">5</div>
-      <div class="issue-loc gl">GL</div>
       <div class="issue-text"><strong>Corey Krebs missing from Facility Tours calendar</strong> &mdash; round-robin only has Sam &amp; Kimball.</div>
     </div>
     <div class="issue">
-      <div class="issue-n">6</div>
+      <div class="issue-n">4</div>
       <div class="issue-loc sc">SC</div>
-      <div class="issue-text"><strong>Scottsdale Inbound has no webhook</strong> &mdash; post-call data goes nowhere. Has 3 extraction fields (Summary, Successful, Sentiment) but missing 8 fields vs outbound agents. Needs webhook + field parity.</div>
+      <div class="issue-text"><strong>Scottsdale Inbound has no webhook</strong> &mdash; post-call data goes nowhere. Has 3 extraction fields but missing 12 analysis fields that Grapevine Inbound has. Needs webhook + field parity.</div>
     </div>
   </div>
 
