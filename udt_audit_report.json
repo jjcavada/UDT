@@ -1,0 +1,92 @@
+{
+  "audit_date": "2026-03-29T16:19:41.467005",
+  "total_findings": 9,
+  "by_severity": {
+    "CRITICAL": 0,
+    "HIGH": 1,
+    "MEDIUM": 7,
+    "LOW": 1
+  },
+  "findings": [
+    {
+      "severity": "HIGH",
+      "platform": "ghl",
+      "location": "glendale",
+      "title": "Missing 3 stages in Lead Pipeline",
+      "detail": "Pipeline 'Lead Pipeline' in glendale is missing stages that Grapevine has",
+      "expected": "Stages: Appt Booked, Appt Confirmed, New Lead, Not Interested, No\u2011Show, Nurture / Cold, Replied, Tour Complete [Pending], Tour Complete [Sold]",
+      "actual": "Missing: New Lead, No\u2011Show, Nurture / Cold",
+      "fix": "Add missing stages to glendale's 'Lead Pipeline' pipeline in GHL"
+    },
+    {
+      "severity": "MEDIUM",
+      "platform": "n8n",
+      "location": "scottsdale",
+      "title": "Wrong timezone in UDT_Make_Call -> Check Business Hours",
+      "detail": "Node uses timezone 'America/Chicago' instead of 'America/Phoenix'",
+      "expected": "America/Phoenix",
+      "actual": "America/Chicago",
+      "fix": "Update timezone to America/Phoenix"
+    },
+    {
+      "severity": "MEDIUM",
+      "platform": "n8n",
+      "location": "grapevine",
+      "title": "Wrong timezone in UDT_GV_POST_CALL -> get_current_day_time",
+      "detail": "Node uses timezone 'America/Phoenix' instead of 'America/Chicago'",
+      "expected": "America/Chicago",
+      "actual": "America/Phoenix",
+      "fix": "Update timezone to America/Chicago"
+    },
+    {
+      "severity": "MEDIUM",
+      "platform": "n8n",
+      "location": "grapevine",
+      "title": "Wrong timezone in UDT_GV_POST_CALL -> Check If Item Exists",
+      "detail": "Node uses timezone 'America/Phoenix' instead of 'America/Chicago'",
+      "expected": "America/Chicago",
+      "actual": "America/Phoenix",
+      "fix": "Update timezone to America/Chicago"
+    },
+    {
+      "severity": "MEDIUM",
+      "platform": "ghl",
+      "location": "glendale",
+      "title": "Missing pipeline: 1. Enrollment Pipeline",
+      "detail": "Grapevine has pipeline '1. Enrollment Pipeline' (13 stages) but glendale does not",
+      "fix": "Create '1. Enrollment Pipeline' pipeline in glendale GHL with 13 stages matching Grapevine"
+    },
+    {
+      "severity": "MEDIUM",
+      "platform": "ghl",
+      "location": "glendale",
+      "title": "Missing pipeline: B_F Lead",
+      "detail": "Grapevine has pipeline 'B_F Lead' (4 stages) but glendale does not",
+      "fix": "Create 'B_F Lead' pipeline in glendale GHL with 4 stages matching Grapevine"
+    },
+    {
+      "severity": "MEDIUM",
+      "platform": "ghl",
+      "location": "glendale",
+      "title": "Missing pipeline: Corporate Membership",
+      "detail": "Grapevine has pipeline 'Corporate Membership' (10 stages) but glendale does not",
+      "fix": "Create 'Corporate Membership' pipeline in glendale GHL with 10 stages matching Grapevine"
+    },
+    {
+      "severity": "MEDIUM",
+      "platform": "ghl",
+      "location": "glendale",
+      "title": "Missing pipeline: No Show / Cancel",
+      "detail": "Grapevine has pipeline 'No Show / Cancel' (3 stages) but glendale does not",
+      "fix": "Create 'No Show / Cancel' pipeline in glendale GHL with 3 stages matching Grapevine"
+    },
+    {
+      "severity": "LOW",
+      "platform": "ghl",
+      "location": "glendale",
+      "title": "Duplicate pipeline: A. Sales Pipeline",
+      "detail": "Pipeline 'A. Sales Pipeline' appears 2 times in glendale",
+      "fix": "Delete the duplicate 'A. Sales Pipeline' pipeline (keep the one with correct stages)"
+    }
+  ]
+}
