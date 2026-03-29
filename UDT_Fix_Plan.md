@@ -1,9 +1,9 @@
 # UDT Glendale — Complete Fix Plan
 
-**Date:** March 28, 2026
+**Date:** March 29, 2026 (Updated)
 **Prepared by:** Jay (VA) + Claude
 **Deadline:** March 30, 2026
-**Status:** 5 of 12 issues fixed, 7 remaining
+**Status:** 11 of 12 issues fixed, 1 remaining (Corey Krebs calendar)
 
 ---
 
@@ -17,10 +17,16 @@
 | 4 | Make_Call — location ID, timezone | Done |
 | 5 | InBound_call — location ID, API key | Done |
 | 6 | Reactivation_call — location ID (2 nodes), API key | Done |
+| 7 | Post_Call — hardcoded Grapevine stage ID replaced with Glendale Nurture ID | Done (Mar 29) |
+| 8 | Reactivation_call — phone +18177789641 → +14804055948 | Done (Mar 29) |
+| 9 | Glendale Outbound webhook — 00d8c02c → ff0ccb3b (Retell) | Done (Mar 29) |
+| 10 | Glendale Inbound webhook — set to 38463130 (Retell) | Done (Mar 29) |
+| 11 | Scottsdale Inbound — added all 12 analysis fields (Retell) | Done (Mar 29) |
+| 12 | Glendale Lead Pipeline — added 3 missing stages: No-show, Nurture, Not Interested (GHL) | Done (Mar 29, Jay manual) |
 
 ---
 
-## Remaining Issues — Ordered by Priority
+## Remaining Issues — 1 Item Left
 
 ### ISSUE 1: Post_Call has hardcoded Grapevine pipeline stage ID
 **Severity:** HIGH — will cause errors when activated
@@ -128,3 +134,21 @@ Both work, but `key_889962` appears to be a master workspace key with access to 
 | 7 | Add Corey Krebs to calendar | 2 min | No |
 | 8 | Fix Scottsdale Inbound | 10 min | No |
 | **Total** | | **~35-50 min** | |
+
+---
+
+## Audit Tool
+
+A reusable audit script has been built at `udt-audit/scripts/udt_audit.py`. Run it anytime to scan all 3 platforms (n8n, Retell, GHL) and automatically flag misconfigurations:
+
+```bash
+python3 udt-audit/scripts/udt_audit.py
+```
+
+**What it checks:** Cross-location ID contamination in n8n workflows, Retell webhook routing, missing analysis fields, GHL pipeline structure gaps (missing stages/pipelines/duplicates), phone number mismatches, timezone errors, and workflow activation status.
+
+**Last run (Mar 29):** Found 14 issues — 2 CRITICAL (hardcoded Grapevine stage IDs), 4 HIGH, 7 MEDIUM, 1 LOW. All match the fix plan above.
+
+**Additional finding:** Glendale has stage "New" while Grapevine has "New Lead" — consider renaming for consistency.
+
+**Also found:** Scottsdale's UDT_Make_Call has `America/Chicago` timezone in the "Check Business Hours" node (should be `America/Phoenix`). Grapevine's UDT_GV_POST_CALL has `America/Phoenix` in 2 nodes (should be `America/Chicago`). These are pre-existing issues not in the original fix scope but worth noting.
